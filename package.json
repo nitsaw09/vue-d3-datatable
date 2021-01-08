@@ -1,0 +1,33 @@
+{
+  "name": "weather-app-redux",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "nodemon server.js",
+    "client": "cd client && npm run serve",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "docker:up": "docker-compose up -d",
+    "docker:build": "docker-compose up -d --build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nitsaw09/weather-app-redux.git"
+  },
+  "author": "Nitesh Ghuge",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nitsaw09/weather-app-redux/issues"
+  },
+  "homepage": "https://github.com/nitsaw09/weather-app-redux#readme",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "body-parser": "^1.19.0",
+    "concurrently": "5.1.0",
+    "csv-parser": "^3.0.0",
+    "express": "^4.8.7",
+    "fs": "0.0.1-security",
+    "nodemon": "2.0.2",
+    "path": "0.12.7"
+  }
+}
