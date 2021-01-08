@@ -1,9 +1,6 @@
-# Temperature Chart
+# Vue D3 Datatable
 
-Weather APP to show the temperature  today for virginia.
-
-# Demo
-https://temp-chart-app.herokuapp.com/
+Vue bootstrap datatable and d3.js.
 
 ## Installation
 
@@ -14,21 +11,10 @@ https://temp-chart-app.herokuapp.com/
 ## Usage
 
 1. Download or Clone the project. 
-2. To run client ```npm run client```
+2. To run client ```npm run serve```
 3. To run Server ```npm run server```
 4. To run client and server concurrently ```npm run dev```
-5. Go to browser ```http://localhost:3000``` to view the app.
-
-## Docker 
-```npm run docker:up```
-```npm run docker:build```
-
-## Weather API
-
-http://weatherapi.com API is used for getting weather details
-
-https://api.weatherapi.com/v1/forecast.json?key=3738897fde7047f0a1822737203011&q=20171&days=1
-
+5. Go to browser ```http://localhost:8080``` to view the app.
 ## License
 Copyright (c) 2020 Nitesh Ghuge \
 Licensed under the MIT license.
