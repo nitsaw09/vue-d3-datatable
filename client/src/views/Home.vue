@@ -2,8 +2,11 @@
   <div class="home">
     <data-table
       data-name="shipment-list"
-      v-if="busy"
-      :data="shipmentData"
+      :items="shipmentData"
+      :fields="fields"
+      sortBy="month"
+      title="Details"
+      :isBusy="busy"
     ></data-table>
   </div>
 </template>
@@ -19,16 +22,12 @@ export default {
   },
   data() {
     return {
-      shipmentData: {
-        title: "Details",
-        fields: [
-          { key: "month", label: "Pickup Date", sortable: true },
-          { key: "deliverd", label: "Deliverd", sortable: true },
-          { key: "undelivered", label: "Undelivered", sortable: true }
-        ],
-        items: [],
-        sortBy: "month"
-      },
+      shipmentData: [],
+      fields: [
+        { key: "month", label: "Pickup Date", sortable: true },
+        { key: "deliverd", label: "Deliverd", sortable: true },
+        { key: "undelivered", label: "Undelivered", sortable: true }
+      ],
       busy: false
     };
   },
@@ -37,10 +36,11 @@ export default {
   },
   methods: {
     getShipment() {
+      this.busy = true;
       getFetch("shipment")
         .then(data => {
-          this.shipmentData.items = data;
-          this.busy = true;
+          this.shipmentData = data;
+          this.busy = false;
         })
         .catch(err => console.log(err));
     }
