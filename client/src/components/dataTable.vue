@@ -140,7 +140,10 @@ export default {
     pageRecordDetails() {
       let to;
       let from;
-      if (this.currentPage === this.totalPages) {
+      if (this.currentPage === 0) {
+        from = 0;
+        to = 0;
+      } else if (this.currentPage === this.totalPages) {
         from = (this.currentPage - 1) * this.perPage + 1;
         to = this.totalRows;
       } else if (this.currentPage === 1) {
@@ -160,18 +163,18 @@ export default {
     onFiltered(filteredItems) {
       this.totalRows = filteredItems.length;
       this.totalPages = this.pageCount();
-      this.currentPage = 1;
+      this.currentPage = this.totalPages >= 1 ? 1 : 0;
     },
     dataPerPage() {
       this.totalPages = this.pageCount();
     },
     paginate(direction) {
-      switch(direction) {
+      switch (direction) {
         case "forward previous":
           this.currentPage = 1;
           break;
         case "previous":
-          this.currentPage = this.currentPage - 1
+          this.currentPage = this.currentPage - 1;
           break;
         case "next":
           this.currentPage = this.currentPage + 1;
