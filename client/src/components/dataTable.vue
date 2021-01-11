@@ -115,7 +115,8 @@ export default {
     fields: Array,
     sortBy: String,
     sortDirection: String,
-    isBusy: Boolean
+    isBusy: Boolean,
+    recorderPerPage: Number
   },
   data() {
     return {
@@ -126,7 +127,7 @@ export default {
       totalRows: 1,
       totalPages: 1,
       currentPage: 1,
-      perPage: 5,
+      perPage: this.recorderPerPage || 5,
       pageOptions: [5, 10, 20, 50]
     };
   },
@@ -153,7 +154,7 @@ export default {
         to = this.perPage * this.currentPage;
         from = to - this.perPage + 1;
       }
-      return `Showing ${from} - ${to} of ${this.totalRows}`;
+      return `Showing ${from} - ${to} of ${this.totalRows} entries`;
     }
   },
   methods: {

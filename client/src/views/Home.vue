@@ -1,9 +1,10 @@
 <template>
   <div class="home">
+    <bar-chart v-if="!busy" :data="shipmentData" :columns="columns"></bar-chart>
     <data-table
       data-name="shipment-list"
       :items="shipmentData"
-      :fields="fields"
+      :fields="columns"
       sortBy="month"
       title="Details"
       :isBusy="busy"
@@ -12,18 +13,20 @@
 </template>
 
 <script>
+import BarChart from "../components/charts/barChart.vue";
 import DataTable from "../components/dataTable.vue";
 import { getFetch } from "../utils/apiRequest";
 
 export default {
   name: "Home",
   components: {
+    BarChart,
     DataTable
   },
   data() {
     return {
       shipmentData: [],
-      fields: [
+      columns: [
         { key: "month", label: "Pickup Date", sortable: true },
         { key: "deliverd", label: "Deliverd", sortable: true },
         { key: "undelivered", label: "Undelivered", sortable: true }
