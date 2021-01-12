@@ -164,6 +164,7 @@ export default {
     },
     dataPerPage() {
       this.totalPages = this.pageCount();
+      this.currentPage = 1;
     },
     paginate(direction) {
       switch (direction) {
