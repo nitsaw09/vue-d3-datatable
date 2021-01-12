@@ -24,7 +24,6 @@
           :fields="fields"
           :sort-by.sync="sortColumn"
           :sort-direction="sortOrder"
-          :busy="isBusy"
           :filter="filter"
           :filter-included-fields="filterOn"
           :currentPage="currentPage"
@@ -115,7 +114,6 @@ export default {
     fields: Array,
     sortBy: String,
     sortDirection: String,
-    isBusy: Boolean,
     recorderPerPage: Number
   },
   data() {
@@ -132,10 +130,8 @@ export default {
     };
   },
   mounted() {
-    setTimeout(() => {
-      this.totalRows = this.items.length;
-      this.totalPages = this.pageCount();
-    }, 100);
+    this.totalRows = this.items.length;
+    this.totalPages = this.pageCount();
   },
   computed: {
     pageRecordDetails() {

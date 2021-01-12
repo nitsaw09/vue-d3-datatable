@@ -1,13 +1,19 @@
 <template>
   <div class="home">
-    <bar-chart v-if="!busy" :data="shipmentData" :columns="columns"></bar-chart>
+    <bar-chart
+      v-if="!busy"
+      :data="shipmentData"
+      :xData="chartDetails.xData"
+      :yData="chartDetails.yData"
+      :colors="chartDetails.colors"
+    ></bar-chart>
     <data-table
+      v-if="!busy"
       data-name="shipment-list"
       :items="shipmentData"
       :fields="columns"
       sortBy="month"
       title="Details"
-      :isBusy="busy"
     ></data-table>
   </div>
 </template>
@@ -31,6 +37,11 @@ export default {
         { key: "deliverd", label: "Deliverd", sortable: true },
         { key: "undelivered", label: "Undelivered", sortable: true }
       ],
+      chartDetails: {
+        xData: "month",
+        yData: ["deliverd", "undelivered"],
+        colors: ["#4DAF4A", "#377EB8"]
+      },
       busy: false
     };
   },

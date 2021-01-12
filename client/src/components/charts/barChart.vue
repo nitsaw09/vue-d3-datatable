@@ -11,7 +11,9 @@ export default {
   name: "bar-chart",
   props: {
     data: Array,
-    columns: Array
+    xData: String,
+    yData: Array,
+    colors: Array
   },
   mounted() {
     this.loadBarChart();
@@ -28,26 +30,24 @@ export default {
       const svg = d3
         .select("#bar-chart")
         .append("svg")
-        .attr("viewBox", [0, 20, width, height])
+        .attr("viewBox", [0, -50, width, height])
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + 0 + ")");
 
       const data = this.data;
-
-      const columns = this.columns.map(col => col.key).slice(1);
-
-      const sipments = columns;
+      const xData = this.xData;
+      const yData = this.yData 
 
       const months = d3
         .map(data, function(d) {
-          return d.month;
+          return d[xData];
         })
         .keys();
 
       //stack the data
       const stackedData = d3
         .stack()
-        .keys(sipments)(data)
+        .keys(yData)(data)
         .map(d => (d.forEach(v => (v.key = d.key)), d));
 
       // Add X axis
@@ -58,7 +58,7 @@ export default {
         .padding([0.5]);
       svg
         .append("g")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0," + 300 + ")")
         .attr("class", "x axis")
         .call(d3.axisBottom(x).tickSizeOuter(0));
 
@@ -66,7 +66,7 @@ export default {
       const y = d3
         .scaleLinear()
         .domain([0, d3.max(stackedData, d => d3.max(d, d => d[1]))])
-        .rangeRound([height, margin.top]);
+        .rangeRound([height - 70, margin.top]);
       svg
         .append("g")
         .attr("class", "y axis")
@@ -77,17 +77,19 @@ export default {
             .tickSize(-width, 0, 0)
         );
 
-      // color palette = one color per shipment
+      // color palette
+      const colors = this.colors;
+
       const color = d3
         .scaleOrdinal()
-        .domain(sipments)
-        .range(["#e41a1c", "#377eb8"]);
+        .domain(yData)
+        .range(colors);
 
       // Show the bars
       svg
         .append("g")
         .selectAll("g")
-        // Enter in the stack data = loop key per key = month per month
+        // Enter in the stack data
         .data(stackedData)
         .enter()
         .append("g")
@@ -95,14 +97,13 @@ export default {
           return color(d.key);
         })
         .selectAll("rect")
-        // enter a second time = loop shipment per shipment to add all rectangles
         .data(function(d) {
           return d;
         })
         .enter()
         .append("rect")
         .attr("x", function(d) {
-          return x(d.data.month);
+          return x(d.data[xData]);
         })
         .attr("y", function(d) {
           return y(d[1]);
@@ -111,6 +112,37 @@ export default {
           return y(d[0]) - y(d[1]);
         })
         .attr("width", x.bandwidth());
+
+      // Draw legend
+      const legend = svg
+        .selectAll(".legend")
+        .data(colors)
+        .enter()
+        .append("g")
+        .attr("transform", function(d, i) {
+          return "translate( -" + (i * 70 + 120) + ", -20)";
+        });
+      legend
+        .append("circle")
+        .attr("x", width - 18)
+        .attr("cx", width - 10)
+        .attr("cy", 10)
+        .attr("r", 6)
+        .style("fill", function(d, i) {
+          return colors.slice().reverse()[i];
+        });
+
+      const legendTexts = yData.reverse();
+      legend
+        .append("text")
+        .attr("x", width + 5)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "start")
+        .text(function(d, i) {
+          const text = legendTexts[i];
+          return text.charAt(0).toUpperCase() + text.slice(1);
+        });
     }
   }
 };
