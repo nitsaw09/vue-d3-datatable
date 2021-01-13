@@ -5,7 +5,6 @@
       <b-form-select
         v-model="chartType"
         :options="chartOptions"
-        style="width:120px;"
         @change="onChangeBar"
         class="float-left"
       ></b-form-select>
@@ -223,7 +222,8 @@ export default {
 }
 
 #select-bar select {
-  font: 12x sans-serif;
+  width:120px;
+  font: 12px sans-serif;
 }
 
 #bar-chart {
