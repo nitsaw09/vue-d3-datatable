@@ -1,5 +1,15 @@
 <template>
   <div class="container">
+    <div id="select-bar">
+      <label style="float:left">Bar Chart</label><br/>
+      <b-form-select
+        v-model="chartType"
+        :options="chartOptions"
+        style="width:120px;"
+        @change="onChangeBar"
+        class="float-left"
+      ></b-form-select>
+    </div>
     <div id="bar-chart"></div>
   </div>
 </template>
@@ -15,6 +25,12 @@ export default {
     yData: Array,
     colors: Array
   },
+  data() {
+    return {
+      chartType: "stacked",
+      chartOptions: ["stacked", "grouped"]
+    };
+  },
   mounted() {
     this.loadBarChart();
   },
@@ -25,30 +41,22 @@ export default {
         width = 1100 - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom;
 
-      // append the svg object to the body of the page
-
       const svg = d3
         .select("#bar-chart")
         .append("svg")
-        .attr("viewBox", [0, -50, width, height])
+        .attr("viewBox", [0, -50, width, 440])
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + 0 + ")");
 
       const data = this.data;
       const xData = this.xData;
-      const yData = this.yData 
+      const yData = this.yData;
 
       const months = d3
         .map(data, function(d) {
           return d[xData];
         })
         .keys();
-
-      //stack the data
-      const stackedData = d3
-        .stack()
-        .keys(yData)(data)
-        .map(d => (d.forEach(v => (v.key = d.key)), d));
 
       // Add X axis
       const x = d3
@@ -58,15 +66,22 @@ export default {
         .padding([0.5]);
       svg
         .append("g")
-        .attr("transform", "translate(0," + 300 + ")")
+        .attr("transform", "translate(0," + height + ")")
         .attr("class", "x axis")
         .call(d3.axisBottom(x).tickSizeOuter(0));
 
       // Add Y axis
+      const yDataCount = yData.length;
+      let yAxisData = [];
+      for (let i = 0; i < yDataCount; i++) {
+        data.forEach(d => yAxisData.push(d[yData[i]]));
+      }
+
+      const yLen = Math.max(...yAxisData);
       const y = d3
         .scaleLinear()
-        .domain([0, d3.max(stackedData, d => d3.max(d, d => d[1]))])
-        .rangeRound([height - 70, margin.top]);
+        .domain([0, yLen + yLen / 4])
+        .rangeRound([height, margin.top]);
       svg
         .append("g")
         .attr("class", "y axis")
@@ -85,33 +100,79 @@ export default {
         .domain(yData)
         .range(colors);
 
-      // Show the bars
-      svg
-        .append("g")
-        .selectAll("g")
-        // Enter in the stack data
-        .data(stackedData)
-        .enter()
-        .append("g")
-        .attr("fill", function(d) {
-          return color(d.key);
-        })
-        .selectAll("rect")
-        .data(function(d) {
-          return d;
-        })
-        .enter()
-        .append("rect")
-        .attr("x", function(d) {
-          return x(d.data[xData]);
-        })
-        .attr("y", function(d) {
-          return y(d[1]);
-        })
-        .attr("height", function(d) {
-          return y(d[0]) - y(d[1]);
-        })
-        .attr("width", x.bandwidth());
+      if (this.chartType === "stacked") {
+        //stack the data
+        const stackedData = d3
+          .stack()
+          .keys(yData)(data)
+          .map(d => (d.forEach(v => (v.key = d.key)), d));
+        // Show the bars
+        svg
+          .append("g")
+          .selectAll("g")
+          .data(stackedData)
+          .enter()
+          .append("g")
+          .attr("fill", function(d) {
+            return color(d.key);
+          })
+          .selectAll("rect")
+          .data(function(d) {
+            return d;
+          })
+          .enter()
+          .append("rect")
+          .attr("x", function(d) {
+            return x(d.data[xData]);
+          })
+          .attr("y", function(d) {
+            return y(d[1]);
+          })
+          .attr("height", function(d) {
+            return y(d[0]) - y(d[1]);
+          })
+          .attr("width", x.bandwidth());
+      } else if (this.chartType === "grouped") {
+        // group the data
+        var groupData = d3
+          .scaleBand()
+          .domain(yData)
+          .range([0, x.bandwidth()])
+          .padding([0.01]);
+
+        // Show the bars
+        svg
+          .append("g")
+          .selectAll("g")
+          // Enter in data = loop group per group
+          .data(data)
+          .enter()
+          .append("g")
+          .attr("transform", function(d) {
+            return "translate(" + x(d.month) + ",0)";
+          })
+          .selectAll("rect")
+          .data(function(d) {
+            return yData.map(function(key) {
+              return { key: key, value: d[key] };
+            });
+          })
+          .enter()
+          .append("rect")
+          .attr("x", function(d) {
+            return groupData(d.key);
+          })
+          .attr("y", function(d) {
+            return y(d.value);
+          })
+          .attr("width", groupData.bandwidth())
+          .attr("height", function(d) {
+            return height - y(d.value);
+          })
+          .attr("fill", function(d) {
+            return color(d.key);
+          });
+      }
 
       // Draw legend
       const legend = svg
@@ -122,6 +183,7 @@ export default {
         .attr("transform", function(d, i) {
           return "translate( -" + (i * 70 + 120) + ", -20)";
         });
+      
       legend
         .append("circle")
         .attr("x", width - 18)
@@ -131,8 +193,7 @@ export default {
         .style("fill", function(d, i) {
           return colors.slice().reverse()[i];
         });
-
-      const legendTexts = yData.reverse();
+        
       legend
         .append("text")
         .attr("x", width + 5)
@@ -140,15 +201,31 @@ export default {
         .attr("dy", ".35em")
         .style("text-anchor", "start")
         .text(function(d, i) {
-          const text = legendTexts[i];
+          const text = yData.slice().reverse()[i];
           return text.charAt(0).toUpperCase() + text.slice(1);
         });
-    }
+    },
+  onChangeBar() {
+    d3.select("svg").remove();
+    this.loadBarChart();
+  }
   }
 };
 </script>
 
 <style>
+#select-bar {
+  width: 100px;
+}
+
+#select-bar label {
+  font: 10px sans-serif;
+}
+
+#select-bar select {
+  font: 12x sans-serif;
+}
+
 #bar-chart {
   margin-right: 50px;
   margin-bottom: 50px;
