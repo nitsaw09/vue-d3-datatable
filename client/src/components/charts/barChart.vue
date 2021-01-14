@@ -52,7 +52,7 @@ export default {
       const yData = this.yData;
 
       const months = d3
-        .map(data, function(d) {
+        .map(data, d => {
           return d[xData];
         })
         .keys();
@@ -114,24 +114,17 @@ export default {
           .data(stackedData)
           .enter()
           .append("g")
-          .attr("fill", function(d) {
-            return color(d.key);
-          })
+          .attr("fill", d => color(d.key))
           .selectAll("rect")
-          .data(function(d) {
-            return d;
-          })
+          .data(d => d)
           .enter()
           .append("rect")
-          .attr("x", function(d) {
-            return x(d.data[xData]);
-          })
-          .attr("y", function(d) {
-            return y(d[1]);
-          })
-          .attr("height", function(d) {
-            return y(d[0]) - y(d[1]);
-          })
+          .attr("x", d => x(d.data[xData]))
+          .attr("y", d => y(d[1]))
+          .transition()
+          .duration(800)
+          .attr("height", d => y(d[0]) - y(d[1]))
+          .delay((d,i) => i * 100)
           .attr("width", x.bandwidth());
       } else if (this.chartType === "grouped") {
         // group the data
@@ -149,30 +142,23 @@ export default {
           .data(data)
           .enter()
           .append("g")
-          .attr("transform", function(d) {
-            return "translate(" + x(d.month) + ",0)";
-          })
+          .attr("transform", d => "translate(" + x(d.month) + ",0)")
           .selectAll("rect")
-          .data(function(d) {
-            return yData.map(function(key) {
+          .data(d => {
+            return yData.map(key => {
               return { key: key, value: d[key] };
             });
           })
           .enter()
           .append("rect")
-          .attr("x", function(d) {
-            return groupData(d.key);
-          })
-          .attr("y", function(d) {
-            return y(d.value);
-          })
+          .attr("x", d => groupData(d.key))
+          .attr("y", d => y(d.value))
+          .transition()
+          .duration(1000)
+          .ease("linear")
           .attr("width", groupData.bandwidth())
-          .attr("height", function(d) {
-            return height - y(d.value);
-          })
-          .attr("fill", function(d) {
-            return color(d.key);
-          });
+          .attr("height", d => height - y(d.value))
+          .attr("fill", d => color(d.key));
       }
 
       // Draw legend
@@ -181,7 +167,7 @@ export default {
         .data(colors)
         .enter()
         .append("g")
-        .attr("transform", function(d, i) {
+        .attr("transform", (d, i) => {
           return "translate( -" + (i * 70 + 120) + ", -20)";
         });
       
@@ -192,9 +178,7 @@ export default {
         .attr("cx", width - 10)
         .attr("cy", 10)
         .attr("r", 6)
-        .style("fill", function(d, i) {
-          return legendColors[i];
-        });
+        .style("fill", (d, i) => legendColors[i]);
       
       const legendText = yData.slice().reverse();
       legend
@@ -203,7 +187,7 @@ export default {
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "start")
-        .text(function(d, i) {
+        .text((d, i) => {
           const text = legendText[i];
           return text.charAt(0).toUpperCase() + text.slice(1);
         });
