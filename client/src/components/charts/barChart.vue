@@ -70,13 +70,15 @@ export default {
         .call(d3.axisBottom(x).tickSizeOuter(0));
 
       // Add Y axis
-      const yDataCount = yData.length;
-      let yAxisData = [];
-      for (let i = 0; i < yDataCount; i++) {
-        data.forEach(d => yAxisData.push(d[yData[i]]));
-      }
-
-      const yLen = Math.max(...yAxisData);
+      const yAxisData = [];
+      data.forEach(d => {
+        let yd = 0;
+        yData.forEach(y => {
+          yd = yd + Number(d[y]);
+        });
+        yAxisData.push(yd); // group the data to cal y-axis max length
+      });
+      const yLen = Math.max(...yAxisData); // get the max length of y-axis
       const y = d3
         .scaleLinear()
         .domain([0, yLen + yLen / 4])
@@ -183,6 +185,7 @@ export default {
           return "translate( -" + (i * 70 + 120) + ", -20)";
         });
       
+      const legendColors = colors.slice().reverse();
       legend
         .append("circle")
         .attr("x", width - 18)
@@ -190,9 +193,10 @@ export default {
         .attr("cy", 10)
         .attr("r", 6)
         .style("fill", function(d, i) {
-          return colors.slice().reverse()[i];
+          return legendColors[i];
         });
-        
+      
+      const legendText = yData.slice().reverse();
       legend
         .append("text")
         .attr("x", width + 5)
@@ -200,7 +204,7 @@ export default {
         .attr("dy", ".35em")
         .style("text-anchor", "start")
         .text(function(d, i) {
-          const text = yData.slice().reverse()[i];
+          const text = legendText[i];
           return text.charAt(0).toUpperCase() + text.slice(1);
         });
     },
