@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div id="select-bar">
-      <label style="float:left">Bar Chart</label><br/>
+      <label style="float:left">Bar Chart</label><br />
       <b-form-select
         v-model="chartType"
         :options="chartOptions"
@@ -121,10 +121,7 @@ export default {
           .append("rect")
           .attr("x", d => x(d.data[xData]))
           .attr("y", d => y(d[1]))
-          .transition()
-          .duration(800)
           .attr("height", d => y(d[0]) - y(d[1]))
-          .delay((d,i) => i * 100)
           .attr("width", x.bandwidth());
       } else if (this.chartType === "grouped") {
         // group the data
@@ -153,9 +150,6 @@ export default {
           .append("rect")
           .attr("x", d => groupData(d.key))
           .attr("y", d => y(d.value))
-          .transition()
-          .duration(1000)
-          .ease("linear")
           .attr("width", groupData.bandwidth())
           .attr("height", d => height - y(d.value))
           .attr("fill", d => color(d.key));
@@ -170,7 +164,7 @@ export default {
         .attr("transform", (d, i) => {
           return "translate( -" + (i * 70 + 120) + ", -20)";
         });
-      
+
       const legendColors = colors.slice().reverse();
       legend
         .append("circle")
@@ -179,7 +173,7 @@ export default {
         .attr("cy", 10)
         .attr("r", 6)
         .style("fill", (d, i) => legendColors[i]);
-      
+
       const legendText = yData.slice().reverse();
       legend
         .append("text")
@@ -192,10 +186,10 @@ export default {
           return text.charAt(0).toUpperCase() + text.slice(1);
         });
     },
-  onChangeBar() {
-    d3.select("svg").remove();
-    this.loadBarChart();
-  }
+    onChangeBar() {
+      d3.select("svg").remove();
+      this.loadBarChart();
+    }
   }
 };
 </script>
@@ -210,7 +204,7 @@ export default {
 }
 
 #select-bar select {
-  width:120px;
+  width: 120px;
   font: 12px sans-serif;
 }
 
